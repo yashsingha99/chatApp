@@ -15,7 +15,7 @@ import { Route, Routes } from "react-router-dom";
 
 function App() {
   return (
-    <div className="app ">
+    <div className="app fixed">
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />

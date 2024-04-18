@@ -1,10 +1,14 @@
 import axios from "axios";
 import Cookie from "js-cookie";
+
+
 const config = {
   headers: {
     "Content-type": "application/json",
   },
 };
+
+
 let user = Cookie.get("UserData");
 user = user ? JSON.parse(user).data.userData : user;
 

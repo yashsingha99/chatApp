@@ -39,9 +39,10 @@ function ChatArea() {
       setAllMessage(allMessages.data);
     };
     fetch();
-  }, [allmessage, chat, location]);
-
+  }, [allmessage, chat, location]); 
+  // console.log("chat", chat.isGroupChat);
   const createMessage = async () => {
+
     const data = {
       message,
       chatId: location,
@@ -73,14 +74,14 @@ function ChatArea() {
         </IconButton>
       </div>
 
-      {isOpen && <MoreOptions data={{ chatId: location }} />}
+      {isOpen && <MoreOptions data={{ chatId: location}} isgrpChat = { chat.isGroupChat } />}
 
       <div className={"messages-container" + (lightTheme ? "" : " dark")}>
         {allmessage &&
           allmessage.map((msg, i) => {
             if (userData._id === msg.sender._id)
               return (
-                <div className="self-message-container m-4">
+                <div key={i} className="self-message-container m-4">
                   <div className="relative flex  justify-end">
                     <button
                       className="flex items-center text-sm font-medium text-white-800 hover:text-gray-600 focus:outline-none focus:text-gray-600"
@@ -125,7 +126,7 @@ function ChatArea() {
                         </div>
                       </div>
                     )}
-                    <MessageSelf key={i} msg={msg} />
+                    <MessageSelf msg={msg} />
                   </div>
                 </div>
               );

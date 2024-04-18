@@ -58,7 +58,21 @@ try {
 }
 })
 
+const deleteMessage = asyncHandler(async(req, res) => {
+  const {chatId, user, msgId} = req.body;
+  try {
+    if(!chatId || !user || !msgId)  return res.status(400).send({ message: "Data is insufficient" });
+     const findMsg = await Messages.deleteOne({_id : msgId});
+     if(!findMsg) return res.status(400).send({ message: "message not found" });
+     
+     res.status(200).json(findMsg, {message : "message succesfully deleted"})
+  } catch (error) {
+    res.send(400)
+    throw new Error(error.message)
+  }
+})
 module.exports = {
   allMessages,
-  sendMessages
+  sendMessages,
+  deleteMessage
 };
