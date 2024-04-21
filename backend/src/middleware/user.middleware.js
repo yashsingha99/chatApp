@@ -2,7 +2,7 @@ const  User  = require("../Models/user.models");
 const ApiError = require("../utilis/ApiError");
 const { asyncHandler } = require("../utilis/AsyncHandler");
 const jwt =  require('jsonwebtoken');
-const Cookie = require('js-cookie')
+const Cookies = require('js-cookie')
 const verifyJwt = asyncHandler(async(req, res, next)=>{
   try {
     const token = req.body.user

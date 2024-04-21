@@ -5,11 +5,14 @@ import { BrowserRouter } from "react-router-dom";
 import {store} from "./Store/Store.js"
 import { Provider } from "react-redux";
 import './index.css'
+import { SocketProvider } from "./context/SocketProvider.jsx";
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <BrowserRouter>
     <Provider store={store}>
-      <App />
+     <SocketProvider>
+        <App />
+      </SocketProvider>
     </Provider>
     </BrowserRouter>
   </React.StrictMode>

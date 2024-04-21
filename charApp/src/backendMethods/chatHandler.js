@@ -74,9 +74,9 @@ const addParticipants = async (data) => {
   }
 };
 
-const fetchChats = async (data) => {
+const fetchChats = async () => {
   try {
-    data = { ...data, user };
+   const data ={ user :  user };
     const allChats = await axios.post(
       "http://localhost:5000/chat/fetchChats",
       data,

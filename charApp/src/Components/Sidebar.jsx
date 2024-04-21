@@ -13,24 +13,25 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { changeToggle } from "../Store/toggleSlice";
 import { fetchChats } from "../backendMethods/chatHandler";
+import { useSocket } from "../context/SocketProvider";
+
 function Sidebar() {
  const location =  useLocation()
   const [conversations, setConversations] = useState([]);
   const [chatUser, setChatUser] = useState("");
+  const socket  = useSocket()
   useEffect(() => {
     const fetchChat = async () => {
       const res = await fetchChats();
       setConversations(res.data.allChats);
-      console.log(res.data.allChats);
     };
     fetchChat();
   },[conversations, location]);
   const dispatch = useDispatch();
   const lightTheme = useSelector((state) => state.toggle.light);
-  // const[lightTheme, setLightTheme] = useState(true)
   const navigate = useNavigate();
   return (
-    <div className="sidebar-container">
+    <div className=" sidebar-container">
       <div className={"sb-header" + (lightTheme ? "" : " dark")}>
         <div>
           <IconButton onClick={()=> navigate('/app/profile')} className={lightTheme ? "" : " dark"}>

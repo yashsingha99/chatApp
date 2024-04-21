@@ -19,7 +19,9 @@ function Login() {
       if (user) {
         dispatch(userlogin(user));
         Cookies.set('UserData', JSON.stringify(user))
-        navigate("/app/welcome");
+        if(Cookies.get('UserData'))
+         navigate("/app/welcome");
+        
       } else {
         navigate("/");
       }

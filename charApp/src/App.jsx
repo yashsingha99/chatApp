@@ -12,7 +12,6 @@ import {
 } from "./Components/index";
 import Profile from "./Components/Profile";
 import { Route, Routes } from "react-router-dom";
-
 function App() {
   return (
     <div className="app fixed">
@@ -28,6 +27,7 @@ function App() {
           <Route path="/app/:chatArea" element={<ChatArea />} />
         </Route>
       </Routes>
+      
     </div>
   );
 }

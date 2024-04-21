@@ -38,10 +38,10 @@ const accessMessage = async(data) => {
   }
 }
 
-const deleteMsg = async(data) => {
+const deleteMessage = async(data) => {
   try {
     data = {...data, user: user};
-    const res = await axios.post(`http://localhost:5000/message/deleteMessage/${data.msgId}`,
+    const res = await axios.post(`http://localhost:5000/message/deleteMessage/${data.msg._id}`,
     data,
     config
   )
@@ -50,4 +50,4 @@ const deleteMsg = async(data) => {
     console.log("backendMethods :: messageHandler :: deleteMsg", error);
   }
 }
-export {createMsg, accessMessage, deleteMsg}
+export {createMsg, accessMessage, deleteMessage}

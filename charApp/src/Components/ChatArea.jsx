@@ -13,58 +13,94 @@ import { groupExit } from "../backendMethods/chatHandler";
 import { accessChat } from "../backendMethods/chatHandler";
 import axios from "axios";
 import Cookies from "js-cookie";
+import { deleteMessage } from "../backendMethods/messageHandler";
+import { generateEmojis } from "./GenrateEmoji/genrateEmoji";
+import { useSocket } from "../context/SocketProvider";
+
 function ChatArea() {
+  const tags = [
+    {name : "Smileys & Emotion"},
+    {name : "People & Body"},
+    {name : "Animals & Nature"},
+    {name : "Travel & Places"},
+    { name : "Activities"},
+    { name : "Objects"},
+    { name : "Symbols"},
+   { name :  "Flags"},
+  ];
   const navigate = useNavigate();
   const [message, setMessage] = useState("");
   const [isOpen, setIsOpen] = useState(false);
+  const [isEmojiOpen, setIsEmojiOpen] = useState(false);
   const [isOpenMenu, setIsOpenMenu] = useState(false);
+  const [isOpenMenuId, setIsOpenMenuId] = useState("");
   const [allmessage, setAllMessage] = useState([]);
   const [chat, setChat] = useState([]);
   const location = useLocation().pathname.split("/")[2];
   let userData = Cookies.get("UserData");
   userData = userData ? JSON.parse(userData).data.userData : userData;
-
-  const deleteHandler = async () => {
-    const res = await groupExit({ chatId: location, userId: userData._id });
-    navigate("/app/welcome");
-  };
+  const socket = useSocket()
+  console.log(socket);
+  let em = generateEmojis();
   
   useEffect(() => {
     const fetch = async () => {
       const data = { chatId: location };
       const res = await accessChat(data);
       setChat(res.data);
-      const Chatdata = { chatId: location };
-      const allMessages = await accessMessage(Chatdata);
+      // console.log(res.data);
+      const allMessages = await accessMessage(data);
       setAllMessage(allMessages.data);
     };
     fetch();
-  }, [allmessage, chat, location]); 
-  // console.log("chat", chat.isGroupChat);
-  const createMessage = async () => {
+  }, []);
 
+  const deleteHandler = async () => {
+    const res = await groupExit({
+      groupAdmin: chat.groupAdmin._id,
+      chatId: location,
+      userId: userData._id,
+    });
+    navigate("/app/welcome");
+  };
+
+  const createMessage = async () => {
     const data = {
       message,
       chatId: location,
       recieverId: chat,
     };
     const res = await createMsg(data);
+    Notification.requestPermission();
+    new Notification("New Message", {
+      body: message,
+    });
     setMessage("");
   };
 
+  const deleteMsg = async (msg, state) => {
+    const data = { msg, state, chatId: chat._id };
+    const res = await deleteMessage(data);
+    console.log(res);
+  };
+
   const lightTheme = useSelector((state) => state.toggle.light);
+  
   return (
     <div className="relative cursor-pointer chatArea-container">
-      <div
-        onClick={() => setIsOpen((p) => !p)}
-        className={"chatArea-header" + (lightTheme ? "" : " dark")}
-      >
-        <p className="con-icon">{chat.length > 0 && chat.chatName[0]}</p>
-        <div className={"header-text" + (lightTheme ? "" : " dark")}>
-          <p className={"con-title" + (lightTheme ? "" : " dark")}>
-            {chat.chatName}
-          </p>
-          <p className={"con-timeStamp" + (lightTheme ? "" : " dark")}></p>
+      <div className={"chatArea-header" + (lightTheme ? "" : " dark")}>
+        <div className="w-full flex" onClick={() => setIsOpen((p) => !p)}>
+          <div className="w-1/3   flex">
+            <p className="con-icon text-center">
+              {chat.length > 0 && chat.chatName[0]}
+            </p>
+            <div className={"header-text" + (lightTheme ? "" : " dark")}>
+              <p className={"con-title" + (lightTheme ? "" : " dark")}>
+                {chat.chatName}
+              </p>
+              <p className={"con-timeStamp" + (lightTheme ? "" : " dark")}></p>
+            </div>
+          </div>
         </div>
         <IconButton
           onClick={deleteHandler}
@@ -73,24 +109,39 @@ function ChatArea() {
           <DeleteIcon />
         </IconButton>
       </div>
-
-      {isOpen && <MoreOptions data={{ chatId: location}} isgrpChat = { chat.isGroupChat } />}
-
+      {isOpen && (
+        <MoreOptions user={userData} data={{ chatId: location }} Chat={chat} />
+      )}
       <div className={"messages-container" + (lightTheme ? "" : " dark")}>
         {allmessage &&
           allmessage.map((msg, i) => {
-            if (userData._id === msg.sender._id)
+            let status = false;
+            // console.log(msg);
+            for (let i = 0; i < msg.chat.users.length; i++) {
+              if (msg.chat.users[i]._id === userData._id) {
+                status = true;
+                break;
+              }
+            }
+            if (userData._id === msg.sender._id && status === true)
               return (
                 <div key={i} className="self-message-container m-4">
                   <div className="relative flex  justify-end">
                     <button
                       className="flex items-center text-sm font-medium text-white-800 hover:text-gray-600 focus:outline-none focus:text-gray-600"
-                      onClick={() => setIsOpenMenu((p) => !p)}
+                      onClick={() => {
+                        if (!isOpenMenu || msg._id === isOpenMenuId) {
+                          setIsOpenMenu((p) => !p);
+                          setIsOpenMenuId(msg._id);
+                        }
+                      }}
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         className={`w-4 h-4 ml-1 transition-transform transform ${
-                          isOpenMenu ? "rotate-180" : ""
+                          isOpenMenu && msg._id === isOpenMenuId
+                            ? "rotate-180"
+                            : ""
                         }`}
                         viewBox="0 0 20 20"
                         fill="currentColor"
@@ -102,21 +153,28 @@ function ChatArea() {
                         />
                       </svg>
                     </button>
-                    {isOpenMenu && (
-                      <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg z-10">
+                    {isOpenMenu && msg._id === isOpenMenuId && (
+                      <div className="absolute right-20 mt-2 w-48 rounded-md shadow-lg z-10">
                         <div className="py-1 rounded-md bg-gradient-to-br from-gray-800 to-gray-600">
-                          <a
-                            href="#"
+                          <div
+                            onClick={() => {
+                              deleteMsg(msg, true);
+                            }}
                             className="block px-4 py-2 text-sm text-white hover:bg-gray-700 transition-colors"
                           >
-                            Delete
-                          </a>
-                          <a
-                            href="#"
+                            Delete for me
+                          </div>
+                          <div
+                            onClick={() => {
+                              deleteMsg(msg, false);
+                            }}
                             className="block px-4 py-2 text-sm text-white hover:bg-gray-700 transition-colors"
                           >
+                            Delete for EveryOne
+                          </div>
+                          <div className="block px-4 py-2 text-sm text-white hover:bg-gray-700 transition-colors">
                             Copy
-                          </a>
+                          </div>
                           <div className="block cursor-pointer px-4 py-2 text-sm text-white hover:bg-gray-700 transition-colors">
                             Select
                           </div>
@@ -130,10 +188,84 @@ function ChatArea() {
                   </div>
                 </div>
               );
-            else return <MessageOther key={i} msg={msg} />;
+            else if (status === true)
+              return (
+                <div key={i} className="other-message-container">
+                  <div className="relative flex  justify-end">
+                    <button
+                      className="flex items-center text-sm font-medium text-white-800 hover:text-gray-600 focus:outline-none focus:text-gray-600"
+                      onClick={() => {
+                        if (!isOpenMenu || msg._id === isOpenMenuId) {
+                          setIsOpenMenu((p) => !p);
+                          setIsOpenMenuId(msg._id);
+                        }
+                      }}
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className={`w-4 h-4 ml-1 transition-transform transform ${
+                          isOpenMenu && msg._id === isOpenMenuId
+                            ? "rotate-180"
+                            : ""
+                        }`}
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M6.293 7.293a1 1 0 011.414 0L10 9.586l2.293-2.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414zM10 4a1 1 0 100-2 1 1 0 000 2z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </button>
+                    {isOpenMenu && msg._id === isOpenMenuId && (
+                      <div className="absolute left-72 mt-2 w-48 rounded-md shadow-lg z-10">
+                        <div className="py-1 rounded-md bg-gradient-to-br from-gray-800 to-gray-600">
+                          <div
+                            onClick={() => {
+                              deleteMsg(msg, true);
+                            }}
+                            className="block px-4 py-2 text-sm text-white hover:bg-gray-700 transition-colors"
+                          >
+                            Delete for me
+                          </div>
+                          <div className="block px-4 py-2 text-sm text-white hover:bg-gray-700 transition-colors">
+                            Copy
+                          </div>
+                          <div className="block cursor-pointer px-4 py-2 text-sm text-white hover:bg-gray-700 transition-colors">
+                            Select
+                          </div>
+                          <div className="block cursor-pointer px-4 py-2 text-sm text-white hover:bg-gray-700 transition-colors">
+                            Farward
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    <MessageOther key={i} msg={msg} />
+                  </div>
+                </div>
+              );
           })}
       </div>
+      <div className="relative">
+        {isEmojiOpen && (
+          <div className=" bottom-1 absolute emoji">
+               {  em.map((emoji, i) => (
+                  <div
+                    onClick={(e) => setMessage(message+" "+emoji.image)}
+                    key={i}
+                    className="item"
+                  >
+                    {emoji.image}
+                  </div>
+                ))}
+          </div>
+        )}
+      </div>
       <form className={"text-input-area" + (lightTheme ? "" : " dark")}>
+        <div onClick={() => setIsEmojiOpen((p) => !p)} className="emoji-btn">
+          ☺️
+        </div>
         <input
           type="text"
           placeholder="Type a Message"

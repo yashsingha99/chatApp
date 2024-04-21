@@ -1,6 +1,5 @@
 const { default: mongoose } = require('mongoose')
 const  app  = require('./app')
-const { Socket } = require('socket.io')
 
 
 
@@ -21,16 +20,4 @@ connectdb();
 const port = process.env.PORT || 5000
 
 const server = app.listen(port ,console.log("server is running....."))
-const io = require("socket.io")(server,{
-  cors : {
-    origin: "*",
-  },
-  pingTimeout : 60000
-})
 
-io.on("connection", (socket) => {
-  socket.on("setup", (user) => {
-    socket.join(user.data._id);
-    socket.emit("connection")
-  })
-})

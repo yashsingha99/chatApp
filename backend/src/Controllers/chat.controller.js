@@ -5,23 +5,24 @@ const { asyncHandler } = require("../utilis/AsyncHandler");
 
 const accessChat = asyncHandler(async (req, res) => {
   try {
-     const {chatId, user} = req.body;
-     if(!chatId || !user) return res.status(400).send({ message: "Data is insufficient" });
-     const chat = await Chat.findById(chatId)
-            .populate("latestMessage") //*  using currentUser_id  then populate
-            .populate("users", "-password -refreshToken") //* all of the thing
-            .populate("groupAdmin", "-password -refreshToken")
-     if(!chat) return res.status(400).send({ message: "Chat doesn't found" });
-     res.status(200).json(chat)
+    const { chatId, user } = req.body;
+    if (!chatId || !user)
+      return res.status(400).send({ message: "Data is insufficient" });
+    const chat = await Chat.findById(chatId)
+      .populate("latestMessage") //*  using currentUser_id  then populate
+      .populate("users", "-password -refreshToken") //* all of the thing
+      .populate("groupAdmin", "-password -refreshToken");
+    if (!chat) return res.status(400).send({ message: "Chat doesn't found" });
+    res.status(200).json(chat);
   } catch (error) {
     console.log(error);
-    throw new Error(error)
+    throw new Error(error);
   }
-})
+});
 
 //* Just  fetch  all  chat  which  are  created  by  currentUser
 const fetchChats = asyncHandler(async (req, res) => {
-  const user = req.body.user
+  const user = req.body.user;
   try {
     await Chat.find({ users: { $elemMatch: { $eq: user._id } } }) //* Firstly  find  the  chat documents
       .populate("latestMessage") //*  using currentUser_id  then populate
@@ -34,7 +35,7 @@ const fetchChats = asyncHandler(async (req, res) => {
           path: "latestMessage.sender",
           select: "name email",
         });
-        res.status(200).json({allChats:result});
+        res.status(200).json({ allChats: result });
       });
   } catch (error) {
     res.sendStatus(400);
@@ -44,13 +45,13 @@ const fetchChats = asyncHandler(async (req, res) => {
 
 //* Only  check  in  chat  document  isGroupChat is  true  then retrive that  chat until  to finish  all chat
 const fetchGroups = asyncHandler(async (req, res) => {
-  const user = req.body.user
+  const user = req.body.user;
   try {
     const allGroups = await Chat.find({
-      isGroupChat: true
+      isGroupChat: true,
       /*users: { $elemMatch: { $eq: user._id } }*/
     });
-    res.status(200).json({allGroups:allGroups});
+    res.status(200).json({ allGroups: allGroups });
   } catch (error) {
     res.sendStatus(400);
     throw new Error(error.message);
@@ -142,70 +143,87 @@ const createUserChat = asyncHandler(async (req, res) => {
 const addParticipants = asyncHandler(async (req, res) => {
   const { useremail, chatId } = req.body;
 
-if (!useremail || !chatId) {
-  return res.status(400).send({ message: "Data is insufficient" });
-}
-
-try {
-  const findUser = await User.findOne({ email: useremail });
-  if (!findUser) {
-    return res.status(400).send({ message: "User doesn't exist with this email" });
+  if (!useremail || !chatId) {
+    return res.status(400).send({ message: "Data is insufficient" });
   }
 
-  const findGrp = await Chat.findById(chatId);
-  if (!findGrp) {
-    return res.status(400).send({ message: "Group does not exist." });
-  }
+  try {
+    const findUser = await User.findOne({ email: useremail });
+    if (!findUser) {
+      return res
+        .status(400)
+        .send({ message: "User doesn't exist with this email" });
+    }
 
-  if (!findGrp.isGroupChat) {
-    return res.status(400).send({ message: "You do not have permission to add a user." });
-  }
+    const findGrp = await Chat.findById(chatId);
+    if (!findGrp) {
+      return res.status(400).send({ message: "Group does not exist." });
+    }
 
-  const response = await Chat.updateOne({ _id: chatId },  { $addToSet: { users: findUser._id } });
-  const updatedChat = await Chat.find({_id : chatId})
+    if (!findGrp.isGroupChat) {
+      return res
+        .status(400)
+        .send({ message: "You do not have permission to add a user." });
+    }
+
+    const response = await Chat.updateOne(
+      { _id: chatId },
+      { $addToSet: { users: findUser._id } }
+    );
+    const updatedChat = await Chat.find({ _id: chatId })
       .populate("users")
       .populate("groupAdmin")
-      .populate("latestMessage")
-  return res.status(200).send({updatedChat, message: "User successfully added." });
-} catch (error) {
-  console.error(error);
-  return res.status(500).send(error);
- }
+      .populate("latestMessage");
+    return res
+      .status(200)
+      .send({ updatedChat, message: "User successfully added." });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send(error);
+  }
 });
 
 //* remove  the  user  from  groupChat  (to  find  groupId)  then  update  means  delete(pull)  that  user
 //* and  return  that  user
 const groupExit = asyncHandler(async (req, res) => {
-  const { chatId, userId } = req.body;
-
+  const {groupAdmin, chatId, userId } = req.body;
+  // console.log(chatId, userId);
   try {
-    if (!userId || !chatId) {
+    if (!userId || !chatId || !groupAdmin) {
       res.status(200);
       throw new Error(
         "Group Id and chatId both must required for exit from Group-Chat"
       );
     }
-    const removedUser = await Chat.findByIdAndUpdate(
-      //*  Find  document  acc.  to  chatId
-      chatId,
-      {
-        $pull: { users: userId }, //* pull  the  user  from  users  array
-      },
-      {
-        new: true, //*  This  is  only  for  updated  document  is  returned
-      }
-    )
-      .populate("users", "-password")
-      .populate("groupAdmin", "-password");
+    if (groupAdmin === userId) {
+
+      const deleteChat = await Chat.deleteOne({ _id: chatId });
+
+      res.status(200).json({ deleteChat, message: "successfully deleted" });
+
+    } else {
+      const removedUser = await Chat.findByIdAndUpdate(
+        //*  Find  document  acc.  to  chatId
+        chatId,
+        {
+          $pull: { users: userId }, //* pull  the  user  from  users  array
+        },
+        {
+          new: true, //*  This  is  only  for  updated  document  is  returned
+        }
+      )
+        .populate("users", "-password")
+        .populate("groupAdmin", "-password");
     
     if (!removedUser) {
       res.sendStatus(404);
       throw new Error("Chat not found");
     } else {
-      res.status(200).json({removedUser, message:"successfully deleted"});
+      res.status(200).json({ removedUser, message: "successfully deleted" });
     }
+  }
   } catch (error) {
-    throw new Error(error)
+    throw new Error(error);
   }
 });
 
