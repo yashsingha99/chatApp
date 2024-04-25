@@ -81,9 +81,6 @@ function Login() {
               <span className="hyper">Sign Up</span>
             </Link>
           </p>
-          {/* {logInStatus ? (
-              <Toaster key={logInStatus.key} message={logInStatus.msg} />
-            ) : null} */}
         </div>
       </div>
     </>
