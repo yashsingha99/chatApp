@@ -25,9 +25,6 @@ const signUp = async(data) => {
 
 const login = async(data) =>{
   try {
-    // const cookies = JSON.parse(Cookie.get('UserData')).data.userData
-    // data = {...data, cookies}
-    // console.log(cookies.data.userData);
     const user = await axios.post("http://localhost:5000/user/",
     data,
     config

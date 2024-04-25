@@ -82,7 +82,6 @@ const fetchChats = async () => {
       data,
       config
     );
-    // console.log("allChats",allChats);
     return allChats;
   } catch (error) {
     console.log("backendMethods :: chatHandler :: fetchChats", error);

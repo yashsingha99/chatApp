@@ -11,7 +11,6 @@ import { accessMessage, createMsg } from "../backendMethods/messageHandler";
 import MoreOptions from "./MoreOptions";
 import { groupExit } from "../backendMethods/chatHandler";
 import { accessChat } from "../backendMethods/chatHandler";
-import axios from "axios";
 import Cookies from "js-cookie";
 import { deleteMessage } from "../backendMethods/messageHandler";
 import { generateEmojis } from "./GenrateEmoji/genrateEmoji";
@@ -41,14 +40,12 @@ function ChatArea() {
   userData = userData ? JSON.parse(userData).data.userData : userData;
   const socket = useSocket()
   console.log(socket);
-  let em = generateEmojis();
-  
+  let em = generateEmojis()
   useEffect(() => {
     const fetch = async () => {
       const data = { chatId: location };
       const res = await accessChat(data);
       setChat(res.data);
-      // console.log(res.data);
       const allMessages = await accessMessage(data);
       setAllMessage(allMessages.data);
     };
