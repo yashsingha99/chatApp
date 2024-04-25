@@ -25,13 +25,6 @@ const generateAccessRefreshToken = async (userId) => {
 };
 
 const register = asyncHandler(async (req, res) => {
-  // fetch all data from req
-  // verify all data are fullfilled
-  // check another user aren't register with same email or userId
-  //  then create entry
-  // remove password and refreshToken field from respone...
-  // check for entry is created...
-  // then send to user
 
   const { name, email, password } = req.body;
   if ([name, email, password].some((field) => field?.trim() === "")) {
@@ -52,13 +45,7 @@ const register = asyncHandler(async (req, res) => {
 });
 
 const login = asyncHandler(async (req, res) => {
-  // fetch all data from req
-  // verify all data is available
-  // check user is exist
-  // password check
-  // update refresh token nad accessToken
-  // fetch all data from db
-  // send to user
+
 
   const { email, password } = req.body;
   if (!email || !password) {
