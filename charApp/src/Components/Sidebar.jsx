@@ -13,13 +13,13 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { changeToggle } from "../Store/toggleSlice";
 import { fetchChats } from "../backendMethods/chatHandler";
-import { useSocket } from "../context/SocketProvider";
+// import { useSocket } from "../context/SocketProvider";
 
 function Sidebar() {
  const location =  useLocation()
   const [conversations, setConversations] = useState([]);
   const [chatUser, setChatUser] = useState("");
-  const socket  = useSocket()
+  // const socket  = useSocket()
   useEffect(() => {
     const fetchChat = async () => {
       const res = await fetchChats();

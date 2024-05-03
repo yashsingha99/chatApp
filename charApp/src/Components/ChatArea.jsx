@@ -14,7 +14,7 @@ import { accessChat } from "../backendMethods/chatHandler";
 import Cookies from "js-cookie";
 import { deleteMessage } from "../backendMethods/messageHandler";
 import { generateEmojis } from "./GenrateEmoji/genrateEmoji";
-import { useSocket } from "../context/SocketProvider";
+// import { useSocket } from "../context/SocketProvider";
 
 function ChatArea() {
   const tags = [
@@ -38,9 +38,10 @@ function ChatArea() {
   const location = useLocation().pathname.split("/")[2];
   let userData = Cookies.get("UserData");
   userData = userData ? JSON.parse(userData).data.userData : userData;
-  const socket = useSocket()
-  console.log(socket);
+  // const socket = useSocket()
+  // console.log(socket);
   let em = generateEmojis()
+  // let check;
   useEffect(() => {
     const fetch = async () => {
       const data = { chatId: location };
@@ -112,15 +113,15 @@ function ChatArea() {
       <div className={"messages-container" + (lightTheme ? "" : " dark")}>
         {allmessage &&
           allmessage.map((msg, i) => {
-            let status = false;
-            // console.log(msg);
-            for (let i = 0; i < msg.chat.users.length; i++) {
-              if (msg.chat.users[i]._id === userData._id) {
-                status = true;
-                break;
-              }
-            }
-            if (userData._id === msg.sender._id && status === true)
+            // let status = false;
+            // // console.log(msg);
+            // for (let i = 0; i < msg.chat.users.length; i++) {
+            //   if (msg.chat.users[i]._id === userData._id) {
+            //     status = true;
+            //     break;
+            //   }
+            // }
+            if (userData._id === msg.sender._id )
               return (
                 <div key={i} className="self-message-container m-4">
                   <div className="relative flex  justify-end">
@@ -150,7 +151,7 @@ function ChatArea() {
                         />
                       </svg>
                     </button>
-                    {isOpenMenu && msg._id === isOpenMenuId && (
+                    {/* {isOpenMenu && msg._id === isOpenMenuId && (
                       <div className="absolute right-20 mt-2 w-48 rounded-md shadow-lg z-10">
                         <div className="py-1 rounded-md bg-gradient-to-br from-gray-800 to-gray-600">
                           <div
@@ -180,12 +181,12 @@ function ChatArea() {
                           </div>
                         </div>
                       </div>
-                    )}
+                    )} */}
                     <MessageSelf msg={msg} />
                   </div>
                 </div>
               );
-            else if (status === true)
+            else 
               return (
                 <div key={i} className="other-message-container">
                   <div className="relative flex  justify-end">
@@ -215,7 +216,7 @@ function ChatArea() {
                         />
                       </svg>
                     </button>
-                    {isOpenMenu && msg._id === isOpenMenuId && (
+                    {/* {isOpenMenu && msg._id === isOpenMenuId && (
                       <div className="absolute left-72 mt-2 w-48 rounded-md shadow-lg z-10">
                         <div className="py-1 rounded-md bg-gradient-to-br from-gray-800 to-gray-600">
                           <div
@@ -237,7 +238,7 @@ function ChatArea() {
                           </div>
                         </div>
                       </div>
-                    )}
+                    )} */}
                     <MessageOther key={i} msg={msg} />
                   </div>
                 </div>

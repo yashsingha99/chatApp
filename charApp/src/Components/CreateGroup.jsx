@@ -3,7 +3,6 @@ import DoneOutlineRoundedIcon from "@mui/icons-material/DoneOutlineRounded";
 import { IconButton } from "@mui/material";
 import { useSelector } from "react-redux";
 import { createGroupChat, createUserChat } from "../backendMethods/chatHandler";
-import Toaster from "./Toaster";
 function CreateGroup() {
   const lightTheme = useSelector((state) => state.toggle.light);
   const [grpName, setGrpName] = useState("");
@@ -17,7 +16,6 @@ function CreateGroup() {
       else alert("group is succesfully created");
       setGrpName("");
     } else alert("name is required");
-    // <Toaster message={"name is required"} /> 
   };
   const handleUserChat = async () => {
     if (chatName.length > 0) {

@@ -1,15 +1,13 @@
 import React, { useState } from "react";
 
 function MessageSelf({ msg }) {
+  console.log(msg);
   const utcTime = new Date(msg.updatedAt);
   const istTime = new Date(utcTime.getTime() + 5.5 * 60 * 60 * 1000) + ""; // Adding 5 hours and 30 minutes
   const time = istTime.split(" ");
   const [isOpen, setIsOpen] = useState(false);
   return (
     <>
-      {/* <div className="self-message-container m-4">
-        <div className="relative flex  justify-end"> */}
-        
           <div className="max-w-xs w-full mx-2 bg-green-200 rounded-lg p-2">
             <p className="text-lg text-gray-900">{msg.message}</p>
             <div className="flex items-center justify-end mt-1">
