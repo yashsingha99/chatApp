@@ -1,8 +1,6 @@
 const { default: mongoose } = require('mongoose')
 const  app  = require('./app')
 
-
-
 //* DB CONNECTION .....
 const dbURI = process.env.MONGODB_URI
 const connectdb = async()=>{
