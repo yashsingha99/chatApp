@@ -32,6 +32,7 @@ const sendMessages = asyncHandler(async (req, res) => {
     message,
     chat: chatId,
     reciever: [...ReciverId, user._id],
+    active:true
   };
   try {
     let createdMessage = await Messages.create(newMessage);
@@ -58,40 +59,53 @@ const sendMessages = asyncHandler(async (req, res) => {
 });
 
 const deleteMessage = asyncHandler(async (req, res) => {
-  const { chatId, user, msg, state } = req.body;
+  const {msg} = req.body;
   
   try {
-    if (!chatId || !user || !msg)
+    if ( !msg)
       return res.status(400).send({ message: "Data is insufficient" });
-    if (!state) {
-      const findMsg = await Messages.deleteOne({ _id: msg._id });
+    // if (!state) {
+    //   const findMsg = await Messages.deleteOne({ _id: msg._id });
 
-      res.status(200).send(findMsg, { message: "message succesfully deleted" });
-    } else {
-      const removedUserFromMsg = await Messages.findByIdAndUpdate(
-        //*  Find  document  acc.  to  chatId
-        msg._id,
-        {
-          $pull: { reciever: user._id}, //* pull  the  user  from  users  array
-        },
-        {
-          new: true, //*  This  is  only  for  updated  document  is  returned
-        }
-      );
-      if (!removedUserFromMsg)
-        return res.status(400).send({ message: "message not found" });
-        console.log(chatId, user, msg, state);
-      res
-        .status(200)
-        // .send(removedUserFromMsg, { message: "message succesfully deleted" });
-    }
+    //   res.status(200).send(findMsg, { message: "message succesfully deleted" });
+    // } else {
+    //   const removedUserFromMsg = await Messages.findByIdAndUpdate(
+    //     //*  Find  document  acc.  to  chatId
+    //     msg._id,
+    //     {
+    //       $pull: { reciever: user._id}, //* pull  the  user  from  users  array
+    //     },
+    //     {
+    //       new: true, //*  This  is  only  for  updated  document  is  returned
+    //     }
+    //   );
+    //   if (!removedUserFromMsg)
+    //     return res.status(400).send({ message: "message not found" });
+    //     console.log(chatId, user, msg, state);
+    //   res
+    //     .status(200)
+    // }
+    const findMsg = await Messages.findOne({ _id: msg._id })
+    if(!findMsg)  return res.status(400).send({ message: "message not found" });
+    let active = findMsg.active
+    if(!active){
+        await Messages.findByIdAndUpdate(
+          msg._id,
+          active = false
+        )
+    } else   return res.status(400).send({ message: "message not found" });
+    res.status(200).send({ message: "message succesfully deleted" })
   } catch (error) {
     res.send(400);
     throw new Error(error.message);
   }
 });
+
+const updateMessage = asyncHandler(async(req, res) => {
+})
 module.exports = {
   allMessages,
   sendMessages,
   deleteMessage,
+  updateMessage
 };

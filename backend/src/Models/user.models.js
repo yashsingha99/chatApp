@@ -32,7 +32,7 @@ userSchema.pre("save", async function (next) {
 });
 
 //* create custome methods in models...
-
+ 
 userSchema.methods.isPasswordCorrect = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };

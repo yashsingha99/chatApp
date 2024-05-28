@@ -102,11 +102,6 @@ function Sidebar() {
             return <ConversationItem key={i} data={data} />;
           }
         })}
-        {conversations.map((data, i) => {
-          if (data.chatName.toLowerCase().includes(chatUser.toLowerCase())) {
-            return <ConversationItem key={i} data={data} />;
-          }
-        })}
       </div>
     </div>
   );

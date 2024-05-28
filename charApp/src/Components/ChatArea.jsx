@@ -14,19 +14,20 @@ import { accessChat } from "../backendMethods/chatHandler";
 import Cookies from "js-cookie";
 import { deleteMessage } from "../backendMethods/messageHandler";
 import { generateEmojis } from "./GenrateEmoji/genrateEmoji";
-// import { useSocket } from "../context/SocketProvider";
 
 function ChatArea() {
+
   const tags = [
-    {name : "Smileys & Emotion"},
-    {name : "People & Body"},
-    {name : "Animals & Nature"},
-    {name : "Travel & Places"},
-    { name : "Activities"},
-    { name : "Objects"},
-    { name : "Symbols"},
-   { name :  "Flags"},
+    { name: "Smileys & Emotion" },
+    { name: "People & Body" },
+    { name: "Animals & Nature" },
+    { name: "Travel & Places" },
+    { name: "Activities" },
+    { name: "Objects" },
+    { name: "Symbols" },
+    { name: "Flags" },
   ];
+
   const navigate = useNavigate();
   const [message, setMessage] = useState("");
   const [isOpen, setIsOpen] = useState(false);
@@ -38,10 +39,8 @@ function ChatArea() {
   const location = useLocation().pathname.split("/")[2];
   let userData = Cookies.get("UserData");
   userData = userData ? JSON.parse(userData).data.userData : userData;
-  // const socket = useSocket()
-  // console.log(socket);
-  let em = generateEmojis()
-  // let check;
+
+  let em = generateEmojis();
   useEffect(() => {
     const fetch = async () => {
       const data = { chatId: location };
@@ -51,7 +50,7 @@ function ChatArea() {
       setAllMessage(allMessages.data);
     };
     fetch();
-  }, []);
+  }, [chat]);
 
   const deleteHandler = async () => {
     const res = await groupExit({
@@ -83,7 +82,7 @@ function ChatArea() {
   };
 
   const lightTheme = useSelector((state) => state.toggle.light);
-  
+
   return (
     <div className="relative cursor-pointer chatArea-container">
       <div className={"chatArea-header" + (lightTheme ? "" : " dark")}>
@@ -113,15 +112,8 @@ function ChatArea() {
       <div className={"messages-container" + (lightTheme ? "" : " dark")}>
         {allmessage &&
           allmessage.map((msg, i) => {
-            // let status = false;
-            // // console.log(msg);
-            // for (let i = 0; i < msg.chat.users.length; i++) {
-            //   if (msg.chat.users[i]._id === userData._id) {
-            //     status = true;
-            //     break;
-            //   }
-            // }
-            if (userData._id === msg.sender._id )
+            if(msg.active){
+            if (userData._id === msg.sender._id)
               return (
                 <div key={i} className="self-message-container m-4">
                   <div className="relative flex  justify-end">
@@ -151,7 +143,7 @@ function ChatArea() {
                         />
                       </svg>
                     </button>
-                    {/* {isOpenMenu && msg._id === isOpenMenuId && (
+                    {isOpenMenu && msg._id === isOpenMenuId && (
                       <div className="absolute right-20 mt-2 w-48 rounded-md shadow-lg z-10">
                         <div className="py-1 rounded-md bg-gradient-to-br from-gray-800 to-gray-600">
                           <div
@@ -181,82 +173,93 @@ function ChatArea() {
                           </div>
                         </div>
                       </div>
-                    )} */}
+                    )}
                     <MessageSelf msg={msg} />
                   </div>
                 </div>
               );
-            else 
+            else
               return (
                 <div key={i} className="other-message-container">
-                  <div className="relative flex  justify-end">
-                    <button
-                      className="flex items-center text-sm font-medium text-white-800 hover:text-gray-600 focus:outline-none focus:text-gray-600"
-                      onClick={() => {
-                        if (!isOpenMenu || msg._id === isOpenMenuId) {
-                          setIsOpenMenu((p) => !p);
-                          setIsOpenMenuId(msg._id);
-                        }
-                      }}
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className={`w-4 h-4 ml-1 transition-transform transform ${
-                          isOpenMenu && msg._id === isOpenMenuId
-                            ? "rotate-180"
-                            : ""
-                        }`}
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M6.293 7.293a1 1 0 011.414 0L10 9.586l2.293-2.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414zM10 4a1 1 0 100-2 1 1 0 000 2z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </button>
-                    {/* {isOpenMenu && msg._id === isOpenMenuId && (
-                      <div className="absolute left-72 mt-2 w-48 rounded-md shadow-lg z-10">
-                        <div className="py-1 rounded-md bg-gradient-to-br from-gray-800 to-gray-600">
-                          <div
-                            onClick={() => {
-                              deleteMsg(msg, true);
-                            }}
-                            className="block px-4 py-2 text-sm text-white hover:bg-gray-700 transition-colors"
-                          >
-                            Delete for me
-                          </div>
-                          <div className="block px-4 py-2 text-sm text-white hover:bg-gray-700 transition-colors">
-                            Copy
-                          </div>
-                          <div className="block cursor-pointer px-4 py-2 text-sm text-white hover:bg-gray-700 transition-colors">
-                            Select
-                          </div>
-                          <div className="block cursor-pointer px-4 py-2 text-sm text-white hover:bg-gray-700 transition-colors">
-                            Farward
+                  <div className=" flex w-full justify-end">
+                    <div>
+                      <MessageOther key={i} msg={msg} />
+                      {isOpenMenu && msg._id === isOpenMenuId && (
+                        <div
+                          onMouseOver={() => {
+                            setIsOpenMenu((p) => p);
+                          }}
+                          onMouseLeave={() => setIsOpenLogin((p) => !p)}
+
+                          className=" mt-2 w-48 rounded-md shadow-lg z-10"
+                        >
+                          <div className="py-1 rounded-md bg-gradient-to-br from-gray-800 to-gray-600">
+                            <div
+                              onClick={() => {
+                                deleteMsg(msg, true);
+                              }}
+                              className="block px-4 py-2 text-sm text-white hover:bg-gray-700 transition-colors"
+                            >
+                              Delete for me
+                            </div>
+                            <div className="block px-4 py-2 text-sm text-white hover:bg-gray-700 transition-colors">
+                              Copy
+                            </div>
+                            <div className="block cursor-pointer px-4 py-2 text-sm text-white hover:bg-gray-700 transition-colors">
+                              Select
+                            </div>
+                            <div className="block cursor-pointer px-4 py-2 text-sm text-white hover:bg-gray-700 transition-colors">
+                              Farward
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    )} */}
-                    <MessageOther key={i} msg={msg} />
+                      )}
+                    </div>
+                      <button
+                        className="flex items-center text-sm font-medium text-white-800 hover:text-gray-600 focus:outline-none focus:text-gray-600"
+                        onClick={() => {
+                          if (!isOpenMenu || msg._id === isOpenMenuId) {
+                            setIsOpenMenu((p) => !p);
+                            setIsOpenMenuId(msg._id);
+                          }
+                        }}
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className={`w-4 h-4 ml-1 transition-transform transform ${
+                            isOpenMenu && msg._id === isOpenMenuId
+                              ? "rotate-180"
+                              : ""
+                          }`}
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M6.293 7.293a1 1 0 011.414 0L10 9.586l2.293-2.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414zM10 4a1 1 0 100-2 1 1 0 000 2z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      </button>
+                      
                   </div>
                 </div>
               );
+            }
           })}
       </div>
       <div className="relative">
         {isEmojiOpen && (
           <div className=" bottom-1 absolute emoji">
-               {  em.map((emoji, i) => (
-                  <div
-                    onClick={(e) => setMessage(message+" "+emoji.image)}
-                    key={i}
-                    className="item"
-                  >
-                    {emoji.image}
-                  </div>
-                ))}
+            {em.map((emoji, i) => (
+              <div
+                onClick={(e) => setMessage(message + " " + emoji.image)}
+                key={i}
+                className="item"
+              >
+                {emoji.image}
+              </div>
+            ))}
           </div>
         )}
       </div>

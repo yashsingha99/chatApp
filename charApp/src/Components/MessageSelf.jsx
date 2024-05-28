@@ -3,7 +3,7 @@ import React, { useState } from "react";
 function MessageSelf({ msg }) {
   console.log(msg);
   const utcTime = new Date(msg.updatedAt);
-  const istTime = new Date(utcTime.getTime() + 5.5 * 60 * 60 * 1000) + ""; // Adding 5 hours and 30 minutes
+  const istTime = new Date(utcTime.getTime()) + ""; // Adding 5 hours and 30 minutes
   const time = istTime.split(" ");
   const [isOpen, setIsOpen] = useState(false);
   return (
@@ -25,8 +25,6 @@ function MessageSelf({ msg }) {
               </svg>
             </div>
           </div>
-        {/* </div>
-      </div> */}
     </>
   );
 }

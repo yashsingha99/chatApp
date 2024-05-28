@@ -14,7 +14,7 @@ import Profile from "./Components/Profile";
 import { Route, Routes } from "react-router-dom";
 function App() {
   return (
-    <div className="app fixed">
+    <div className="app fixed w-full">
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />

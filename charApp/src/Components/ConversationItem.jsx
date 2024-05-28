@@ -11,13 +11,9 @@ function ConversationItem({ data }) {
 
   let time;
   const utcTime = new Date(data.latestMessage?.updatedAt);
-  let message = (data.latestMessage?.message.substring(0, 35) === undefined ) ? "" : data.latestMessage?.message.substring(0, 35)+" ...";
+  let message  = data.latestMessage?.message.length > 20 ? data.latestMessage?.message.substring(0, 20)+"..." : data.latestMessage?.message
 if(data.latestMessage){
-// if (data.latestMessage.length > 10) {
-//   const msg = data.latestMessage?.message.toString();
-//   message = msg.substring(0, 12); 
-// }
- const istTime = (new Date(utcTime.getTime() + (5.5 * 60 * 60 * 1000))+""); // Adding 5 hours and 30 minutes
+ const istTime = (new Date(utcTime.getTime())+""); // Adding 5 hours and 30 minutes
   time = istTime.split(" ")
 }
   return (

@@ -4,19 +4,9 @@ import "./mainComponent.css";
 function MessageOther({ msg }) {
   var prop1 = { name: "yash", message: "This is a sample message" };
   const utcTime = new Date(msg.updatedAt);
-  const istTime = new Date(utcTime.getTime() + 5.5 * 60 * 60 * 1000) + ""; // Adding 5 hours and 30 minutes
+  const istTime = new Date(utcTime.getTime()) + "";
   const time = istTime.split(" ");
   return (
-    // 
-    //   <div className="conversation-container1">
-    //     <p className="con-icon">{prop1.name[0]}</p>
-    //     <div className="other-text-content">
-    //       {/* <p className="con-title">{prop1.name}</p> */}
-    //       <h3 className="con-lastMessage">{msg.message}</h3>
-    //       <p className="self-timeStamp">{time[4]}</p>
-    //     </div>
-    //   </div>
-    // </div>
     <div className="other-message-container">
       <div className="conversation-container1">
       <p className="con-icon">{prop1.name[0]}</p>

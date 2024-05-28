@@ -3,10 +3,8 @@ const dotenv = require('dotenv')
 const app = express()
 const cors = require("cors")
 const cookieParser = require("cookie-parser")
-dotenv.config({
-    path:"./env"
-})
 
+dotenv.config();
 app.use(cors({
   origin: process.env.CORS_ORIGIN,
   credentials: true
