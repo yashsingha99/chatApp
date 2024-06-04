@@ -26,22 +26,25 @@ const generateAccessRefreshToken = async (userId) => {
 
 const register = asyncHandler(async (req, res) => {
 
-  const { name, email, password } = req.body;
-  if ([name, email, password].some((field) => field?.trim() === "")) {
-    throw new ApiError(400, "All credentials are required!!");
+  try {
+    const { name, email, password } = req.body;
+    if ([name, email, password].some((field) => field?.trim() === "")) {
+      throw new ApiError(400, "All credentials are required!!");
+    }
+    const isUserExist = await User.findOne({ email });
+    if (isUserExist) {
+      throw new ApiError(404, " User with email already exist ");
+    }
+    const newUser = User.create({ name, email, password });
+  
+    const user = await User.findById(newUser?._id).select(
+      "-password -refreshToken"
+    );
+  
+    return res.status(200).json(user);
+  } catch (error) {
+    console.log(error);
   }
-  console.log(req.body);
-  const isUserExist = await User.findOne({ email });
-  if (isUserExist) {
-    throw new ApiError(404, " User with email already exist ");
-  }
-  const newUser = User.create({ name, email, password });
-
-  const user = await User.findById(newUser?._id).select(
-    "-password -refreshToken"
-  );
-
-  return res.status(200).json(user);
 });
 
 const login = asyncHandler(async (req, res) => {
@@ -53,7 +56,6 @@ const login = asyncHandler(async (req, res) => {
   }
 
   const checkUser = await User.findOne({ email });
-  console.log(checkUser);
   if (!checkUser) {
     throw new ApiError(404, "email is wrong");
   }
