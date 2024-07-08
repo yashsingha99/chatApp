@@ -10,6 +10,7 @@ import { login } from "../backendMethods/auth.methods";
 import Cookies from 'js-cookie'
 function Login() {
   const { register, handleSubmit } = useForm();
+         dispatch(login(user))
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [error, setError] = useState("")

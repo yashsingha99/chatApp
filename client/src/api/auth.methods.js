@@ -1,11 +1,14 @@
 import axios from "axios";
 import Cookie from 'js-cookie'
+import { useDispatch } from "react-redux";
 const config = { 
     headers: {
       "Content-type": "application/json",
     },
   };
 const signUp = async(data) => {
+  const dispatch = useDispatch();
+
    try { 
      const user = await axios.post('http://localhost:5000/user/signup',
      data,
@@ -14,6 +17,7 @@ const signUp = async(data) => {
      if(user){
        
          login({email : data.email, password :  data.password});
+         dispatch(login(user))
          return user
      }
      return null
