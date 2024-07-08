@@ -7,27 +7,43 @@ import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import { login } from "../Store/authSlice";
 import axios from "axios";
-import { signUp } from "../backendMethods/auth.methods";
+import Cookies from 'js-cookie'
+
 function SignUp() {
+
+
   const { register, handleSubmit } = useForm();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [error, setError] = useState({});
+
+
   const signUpHandler = async (data) => {
     setError("")
+
     const config = { 
       headers: {
         "Content-type": "application/json",
       },
     }; 
+
     try { 
       const user = await axios.post('http://localhost:5000/user/signup',
       data,
       config
       )
-      if(user){
-      dispatch(login(user))
-      navigate("/app/welcome");
+
+      if(user) {
+         
+         dispatch(login(user))
+         const user = await axios.post('http://localhost:5000/user/signup',
+           data,
+           config
+         )
+         
+         Cookies.set('UserData', JSON.stringify(user))
+         if(Cookies.get('UserData'))
+            navigate("/app/welcome");
       }
       else {
         setError({msg:"fill again", key : Math.random()})

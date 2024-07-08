@@ -5,7 +5,7 @@ function Profile() {
     let userData = Cookies.get('UserData')
     const navigate = useNavigate();
     userData = userData ? JSON.parse(userData) : ""
-    console.log(userData.data.userData.name);
+    // console.log(userData.data.userData.name);
    const logout = () => {
      Cookies.remove('UserData');
      Cookies.remove('refreshToken');

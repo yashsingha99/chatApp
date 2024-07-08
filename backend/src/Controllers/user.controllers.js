@@ -1,4 +1,3 @@
-//yash
 const { asyncHandler } = require("../utilis/AsyncHandler.js");
 const User = require("../Models/user.models");
 const ApiError = require("../utilis/ApiError");
